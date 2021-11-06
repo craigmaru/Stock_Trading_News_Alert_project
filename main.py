@@ -2,8 +2,8 @@ import requests
 import os
 from twilio.rest import Client
 
-STOCK_NAME = "TSLA"
-COMPANY_NAME = "Tesla Inc"
+STOCK_NAME = "TSLA"  # The stock name
+COMPANY_NAME = "Tesla Inc"  # The company name
 
 FROM_NUM = os.environ["FROM_NUM"]
 TO_NUM = os.environ["TO_NUM"]
