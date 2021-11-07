@@ -5,8 +5,8 @@ from twilio.rest import Client
 STOCK_NAME = "TSLA"  # The stock name
 COMPANY_NAME = "Tesla Inc"  # The company name
 
-FROM_NUM = os.environ["FROM_NUM"]
-TO_NUM = os.environ["TO_NUM"]
+FROM_NUM = os.environ["FROM_NUM"]  # The phone number to send from
+TO_NUM = os.environ["TO_NUM"]  # The phone number to send too
 
 STOCK_ENDPOINT = "https://www.alphavantage.co/query"
 NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
@@ -53,27 +53,34 @@ up_down = '🔺' if positive_diff > 0 else '🔻'
 # before yesterday.
 diff_percent = (positive_difference / yesterday_close) * 100
 
-# Using the News API to get the first 3 news articles related to the COMPANY_NAME.
-if diff_percent > 0:
-    response_2 = requests.get(url=NEWS_ENDPOINT, params=news_api_params)
-    response.raise_for_status()
-    articles = response_2.json()['articles']
 
-    # Creating a list that contains the first 3 articles
-    top_3_articles = articles[:3]
+def text_price():
+    # Using the News API to get the first 3 news articles related to the COMPANY_NAME.
+    if diff_percent > 0:
+        response_2 = requests.get(url=NEWS_ENDPOINT, params=news_api_params)
+        response.raise_for_status()
+        articles = response_2.json()['articles']
 
-    # Creating a new list of the first 3 article's headline and description.
-    formatted_articles = [
-        f"{STOCK_NAME}:{up_down}{diff_percent}%\nHeadline: {article['title']}. \nBrief: {article['description']}" for
-        article in top_3_articles]
+        # Creating a list that contains the first 3 articles
+        top_3_articles = articles[:3]
 
-    # Sending each article as a separate message via Twilio.
-    client = Client(account_sid, auth_token)
+        # Creating a new list of the first 3 article's headline and description.
+        formatted_articles = [
+            f"{STOCK_NAME}:{up_down}{diff_percent}%\nHeadline: {article['title']}. \nBrief: {article['description']}"
+            for
+            article in top_3_articles]
 
-    for articles in formatted_articles:
-        message = client.messages \
-            .create(
-            body=articles,
-            from_=FROM_NUM,
-            to=TO_NUM
-        )
+        # Sending each article as a separate message via Twilio.
+        client = Client(account_sid, auth_token)
+
+        for articles in formatted_articles:
+            message = client.messages \
+                .create(
+                body=articles,
+                from_=FROM_NUM,
+                to=TO_NUM
+            )
+
+
+if __name__ == "__main__":
+    text_price()
